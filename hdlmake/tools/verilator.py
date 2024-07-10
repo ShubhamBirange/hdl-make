@@ -21,24 +21,25 @@
 # along with Hdlmake.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-"""Module providing support for IVerilog (Icarus Verilog) simulator"""
+"""Module providing support for Verilator simulator"""
 
 from __future__ import absolute_import
 import string
+import logging
 
 from .make_sim import ToolSim
 from hdlmake.srcfile import VerilogFile, VHDLFile, SVFile
 
 
-class ToolVerilatorLint(ToolSim):
+class ToolVerilator(ToolSim):
 
     """Class providing the interface for Icarus Verilog simulator"""
 
     TOOL_INFO = {
-        'name': 'Icarus Verilog',
-        'id': 'iverilog',
+        'name': 'Verilator',
+        'id': 'verilator',
         'windows_bin': None,
-        'linux_bin': 'iverilog'}
+        'linux_bin': 'Verilator'}
 
     STANDARD_LIBS = ['std', 'ieee', 'ieee_proposed', 'vl', 'synopsys']
 
@@ -49,17 +50,16 @@ class ToolVerilatorLint(ToolSim):
 
     SIMULATOR_CONTROLS = {'vlog': 'echo $< >> run.command',
                           'vhdl': 'echo $< >> run.command',
-                          'compiler': 'verilator --lint-only -Wall -Wno-fatal --error-limit 1000 '
-                                      '-f run.command '
-                                      '--top-module $(TOP_MODULE)'}
+                          'compiler': 'verilator $(VERILATOR_OPT) --lint-only -Wall -Wno-fatal --error-limit 1000 '
+                                      '-f run.command --top-module $(TOP_MODULE) --exe $(TOP_MODULE)_main.cpp)'}
 
     def __init__(self):
-        super(ToolVerilatorLint, self).__init__()
-        self._tool_info.update(ToolVerilatorLint.TOOL_INFO)
-        self._hdl_files.update(ToolVerilatorLint.HDL_FILES)
-        self._standard_libs.extend(ToolVerilatorLint.STANDARD_LIBS)
-        self._clean_targets.update(ToolVerilatorLint.CLEAN_TARGETS)
-        self._simulator_controls.update(ToolVerilatorLint.SIMULATOR_CONTROLS)
+        super(ToolVerilator, self).__init__()
+        self._tool_info.update(ToolVerilator.TOOL_INFO)
+        self._hdl_files.update(ToolVerilator.HDL_FILES)
+        self._standard_libs.extend(ToolVerilator.STANDARD_LIBS)
+        self._clean_targets.update(ToolVerilator.CLEAN_TARGETS)
+        self._simulator_controls.update(ToolVerilator.SIMULATOR_CONTROLS)
 
     def _makefile_sim_compilation(self):
         """Generate compile simulation Makefile target for Verilator"""
@@ -74,3 +74,19 @@ class ToolVerilatorLint(ToolSim):
             self.writeln("\t\techo \"-I" + inc + "\" >> run.command")
         self.writeln('\n')
         self._makefile_sim_dep_files()
+
+    def _makefile_sim_options(self):
+        """Switch between lint_only or c++ generation option"""
+        verilator_mode = self.manifest_dict.get("verilator_mode", "lint")
+        verilator_args = self.manifest_dict.get("verilator_args", "")
+        if verilator_mode == "lint":
+            verilator_opt = "--lint-only "
+        elif verilator_mode == "compile":
+            verilator_opt = "--cc -O3 -CFLAGS -O3 "
+        else:
+            logging.error("Unsupported Verlator mode: %s (using lint mode)"%verilator_mode)
+            verilator_opt = "--lint-only "
+        verilator_opt += verilator_args
+        verilator_string = f"""VERILATOR_OPT := ${verilator_opt}\n"""
+        self.writeln(verilator_string)
+
