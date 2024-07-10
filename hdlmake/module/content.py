@@ -163,7 +163,7 @@ class ModuleContent(ModuleCore):
             else:
                 include_dirs = []
         else:
-            if 'include_dirs' in self.manifest_dict:
+            if 'include_dirs' in self.top_module.manifest_dict:
                 include_dirs = self.top_module.manifest_dict['include_dirs']
             else:
                 include_dirs = []
