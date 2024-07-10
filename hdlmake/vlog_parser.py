@@ -608,9 +608,9 @@ class VerilogParser(DepParser):
             logging.debug("file %s imports/uses %s.%s package",
                           dep_file.path, dep_file.library, text.group(1))
             used_packages.append("%s.%s"%(dep_file.library, text.group(1)))
-            dep_file.add_relation(
-                DepRelation("%s.%s" % (dep_file.library, text.group(1)),
-                            DepRelation.USE, DepRelation.PACKAGE))
+            # dep_file.add_relation(
+            #     DepRelation("%s.%s" % (dep_file.library, text.group(1)),
+            #                 DepRelation.USE, DepRelation.PACKAGE))
         re.subn(import_pattern, do_imports, buf)
         # packages
         m_inside_package = re.compile(
@@ -623,13 +623,19 @@ class VerilogParser(DepParser):
             matches as indexed plain strings. It adds the found PROVIDE
             relations to the file"""
             # If a file uses and provides a package (for e.g. package is included in
-            # the file), we drop the PROVIDED dependency
-            if not "%s.%s" % (dep_file.library, text.group(1)) in used_packages:
-                logging.debug("found pacakge %s.%s", dep_file.library,
-                            text.group(1))
-                dep_file.add_relation(
-                    DepRelation("%s.%s" % (dep_file.library, text.group(1)),
-                                DepRelation.PROVIDE, DepRelation.PACKAGE))
+            # the file), we drop the USE dependency
+            if "%s.%s" % (dep_file.library, text.group(1)) in used_packages:
+                used_packages.remove("%s.%s" % (dep_file.library, text.group(1)))
+            logging.debug("found pacakge %s.%s", dep_file.library,
+                        text.group(1))
+            dep_file.add_relation(
+                DepRelation("%s.%s" % (dep_file.library, text.group(1)),
+                            DepRelation.PROVIDE, DepRelation.PACKAGE))
+        # update USE relations after we have trimmed cases where the files provides and uses
+        # a package
+        for p in used_packages:
+            dep_file.add_relation(
+                DepRelation(p, DepRelation.USE, DepRelation.PACKAGE))
         re.subn(m_inside_package, do_package, buf)
         # modules and instatniations
         m_inside_module = re.compile(
