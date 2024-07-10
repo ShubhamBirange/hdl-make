@@ -94,8 +94,8 @@ class VsimMakefileWriter(ToolSim):
 """ % (name, src, shell.copy_command())
             return rule
         fileset = self.fileset
-        # self.writeln("INCLUDE_DIRS := +incdir+%s" %
-        #    ('+'.join(top_module.include_dirs)))
+        self.writeln("INCLUDE_DIRS := +incdir+%s" %
+            ('+'.join(self.manifest_dict.get("include_dirs", ''))))
         libs = set(f.library for f in fileset)
         self.write('LIBS := ')
         self.write(' '.join(libs))
