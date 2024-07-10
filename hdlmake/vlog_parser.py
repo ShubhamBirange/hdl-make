@@ -88,6 +88,10 @@ class VerilogPreprocessor(object):
             """Toggle the following element"""
             self.push(not self.pop())
 
+        def empty(self):
+            """Chek if the stack is empty"""
+            return self.stack == []
+
     def __init__(self):
         self.vpp_stack = self.VLStack()
         self.vlog_file = None
@@ -225,6 +229,8 @@ class VerilogPreprocessor(object):
                     self.vpp_stack.push(cond_true)
                     continue
                 elif matches["endif_else"]:
+                    if self.vpp_stack.empty():
+                        logging.error("`endif oe `else without `ifdef in %s"%file_name)
                     if last.group(1) == "endif":
                         self.vpp_stack.pop()
                     else:  # `else
