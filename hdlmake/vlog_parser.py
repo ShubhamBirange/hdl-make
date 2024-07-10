@@ -199,6 +199,7 @@ class VerilogPreprocessor(object):
                       file_name, len(file_content), library)
         buf = _remove_comment(file_content)
         protected_region = False
+        cond_hit = self.VLStack()
         while True:
             new_buf = ""
             n_expansions = 0
@@ -224,8 +225,16 @@ class VerilogPreprocessor(object):
                     cond_true = self._find_macro(last.group(2)) is not None
                     if last.group(1) == "ifndef":
                         cond_true = not cond_true
+                        cond_hit.psuh(cond_true)
                     elif last.group(1) == "elsif":
-                        self.vpp_stack.pop()
+                        logging.debug("elsif %s %s", last.group(2), cond_true)
+                        if self.vpp_stack.pop() or cond_hit.pop():
+                            cond_hit.push(True)
+                            cond_true = False
+                        else:
+                            cond_hit.push(cond_true)
+                    else:
+                        cond_hit.push(cond_true)
                     self.vpp_stack.push(cond_true)
                     continue
                 elif matches["endif_else"]:
