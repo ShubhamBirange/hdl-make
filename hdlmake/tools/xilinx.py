@@ -52,7 +52,7 @@ class ToolXilinx(ToolSyn):
 $(TCL_OPEN)
 {1}
 reset_run {0}
-launch_runs {0}
+launch_runs -verbose {0}
 wait_on_run {0}
 set result [get_property STATUS [get_runs {0}]]
 set keyword [lindex [split '$$'result " "] end]
@@ -130,6 +130,14 @@ $(TCL_CLOSE)'''
                     project_new.append(tmp.format(prop[0], prop[1], prop[2]))
                 else:
                     logging.error('Unknown project property: %s', prop[0])
+        defines = self.manifest_dict.get("defines", {})
+        if defines != {}:
+            s = "{"
+            for k,v in defines.iteritems():
+                s += '%s=%s '%(k,v)
+            s += "}"
+            tmp = prop_val
+            project_new.append(tmp.format('verilog_define', s, 'current_fileset'))
         tmp_dict = {}
         tmp_dict["project"] = self._tcl_controls["project"]
         tmp_dict["synthesize"] = self._tcl_controls["synthesize"]
