@@ -138,6 +138,14 @@ $(TCL_CLOSE)'''
             s += "}"
             tmp = prop_val
             project_new.append(tmp.format('verilog_define', s, 'current_fileset'))
+        include_dirs = self.manifest_dict.get("include_dirs", [])
+        if include_dirs != []:
+            s = "{"
+            for d in include_dirs:
+                s += '%s '%d
+            s += "}"
+            tmp = prop_val
+            project_new.append(tmp.format('include_dirs', s, 'current_fileset'))
         tmp_dict = {}
         tmp_dict["project"] = self._tcl_controls["project"]
         tmp_dict["synthesize"] = self._tcl_controls["synthesize"]
