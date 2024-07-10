@@ -83,7 +83,7 @@ class ToolVerilator(ToolSim):
         if verilator_mode == "lint":
             verilator_opt = "--lint-only "
         elif verilator_mode == "compile":
-            verilator_opt = "--cc -O3 -CFLAGS -O3 "
+            verilator_opt = "--cc "
         else:
             logging.error("Unsupported Verlator mode: %s (using lint mode)"%verilator_mode)
             verilator_opt = "--lint-only "
