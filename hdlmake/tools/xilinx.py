@@ -59,6 +59,14 @@ set keyword [lindex [split '$$'result " "] end]
 if {{ '$$'keyword != \\"Complete!\\" }} {{
     exit 1
 }}
+open_run {0}
+set latches [all_latches]
+set nb_latches [llength '$$'latches]
+if {{ '$$'nb_latches != 0 }} {{
+    puts \\"Found latches:\\"
+    puts '$$'latches
+    exit 1
+}}
 $(TCL_CLOSE)'''
 
     TCL_CONTROLS = {'create': 'create_project $(PROJECT) ./',
