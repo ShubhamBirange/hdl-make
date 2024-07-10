@@ -599,6 +599,7 @@ class VerilogParser(DepParser):
         # requested package
         import_pattern = re.compile(r"(\w+) *::(\w+|\\*)")
 
+        used_packages = []
         def do_imports(text):
             """Function to be applied by re.subn to every match of the
             import_pattern in the Verilog code -- group() returns positive
@@ -606,6 +607,7 @@ class VerilogParser(DepParser):
             relations to the file"""
             logging.debug("file %s imports/uses %s.%s package",
                           dep_file.path, dep_file.library, text.group(1))
+            used_packages.append("%s.%s"%(dep_file.library, text.group(1)))
             dep_file.add_relation(
                 DepRelation("%s.%s" % (dep_file.library, text.group(1)),
                             DepRelation.USE, DepRelation.PACKAGE))
@@ -620,11 +622,14 @@ class VerilogParser(DepParser):
             m_inside_pattern in the Verilog code -- group() returns positive
             matches as indexed plain strings. It adds the found PROVIDE
             relations to the file"""
-            logging.debug("found pacakge %s.%s", dep_file.library,
-                          text.group(1))
-            dep_file.add_relation(
-                DepRelation("%s.%s" % (dep_file.library, text.group(1)),
-                            DepRelation.PROVIDE, DepRelation.PACKAGE))
+            # If a file uses and provides a package (for e.g. package is included in
+            # the file), we drop the PROVIDED dependency
+            if not "%s.%s" % (dep_file.library, text.group(1)) in used_packages:
+                logging.debug("found pacakge %s.%s", dep_file.library,
+                            text.group(1))
+                dep_file.add_relation(
+                    DepRelation("%s.%s" % (dep_file.library, text.group(1)),
+                                DepRelation.PROVIDE, DepRelation.PACKAGE))
         re.subn(m_inside_package, do_package, buf)
         # modules and instatniations
         m_inside_module = re.compile(
