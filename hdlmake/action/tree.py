@@ -64,7 +64,7 @@ class ActionTree(Action):
             except ImportError as error_import:
                 logging.error(error_import)
                 quit()
-            pos = nx.graphviz_layout(hierarchy,
+            pos = nx.nx_pydot.graphviz_layout(hierarchy,
                                      prog=self.options.graphviz,
                                      root=top_id)
             nx.draw(hierarchy, pos,
