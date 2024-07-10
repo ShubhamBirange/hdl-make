@@ -637,7 +637,7 @@ class VerilogParser(DepParser):
             r"(?:endmodule|endinterface)",
             re.DOTALL | re.MULTILINE)
         m_instantiation = re.compile(
-            r"(?:\A|\s*)\s*(\w+)\s+(?:#\s*\(.*?\)\s*)?(\w+)\s*\(.*?\)\s*",
+             r"(?:\A|\s*)\s*(\w+)\s+(?:#\s*\(\s*\..*?\)\s*)?(\w+)\s*\(.*?\)\s*",
             re.DOTALL | re.MULTILINE)
 
         def do_module(text):
