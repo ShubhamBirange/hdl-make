@@ -86,8 +86,7 @@ class ToolQuartus(ToolSyn):
                                '$(TCL_CREATE)\n'
                                'source files.tcl',
                     'bitstream': 'load_package flow\n'
-                                 '$(TCL_OPEN)\n'
-                                 'execute_flow -compile',
+                                 '$(TCL_OPEN)\n',
                     'install_source': ''}
 
     SET_GLOBAL_INSTANCE = 0
@@ -202,7 +201,17 @@ class ToolQuartus(ToolSyn):
                     self.SET_GLOBAL_ASSIGNMENT,
                     {'name_type': prop[0],
                      'name': prop[1]})) 
+        if "include_dirs" in self.manifest_dict.keys():
+            for inc_dir in self.manifest_dict["include_dirs"]:
+                command_list.append(self._emit_property(
+                    self.SET_GLOBAL_ASSIGNMENT,
+                    {'name_type': "SEARCH_PATH",
+                     'name': inc_dir}))
         self._tcl_controls["project"] = '\n'.join(command_list)
+        if "syn_flow" in self.manifest_dict.keys():
+            self._tcl_controls["bitstream"] += 'execute_flow -%s'%self.manifest_dict["syn_flow"]
+        else:
+            self._tcl_controls["bitstream"] += 'execute_flow -compile'
         super(ToolQuartus, self)._makefile_syn_tcl()
 
     def _makefile_syn_files(self):
