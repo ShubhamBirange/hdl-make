@@ -79,6 +79,7 @@ class ToolVerilator(ToolSim):
         """Switch between lint_only or c++ generation option"""
         verilator_mode = self.manifest_dict.get("verilator_mode", "lint")
         verilator_args = self.manifest_dict.get("verilator_args", "")
+        defines = self.manifest_dict.get("defines", {})
         if verilator_mode == "lint":
             verilator_opt = "--lint-only "
         elif verilator_mode == "compile":
@@ -87,6 +88,8 @@ class ToolVerilator(ToolSim):
             logging.error("Unsupported Verlator mode: %s (using lint mode)"%verilator_mode)
             verilator_opt = "--lint-only "
         verilator_opt += verilator_args
+        for k,v in defines.items():
+            verilator_opt += " +define+%s=%s"%(k, str(v))
         verilator_string = f"""VERILATOR_OPT := ${verilator_opt}\n"""
         self.writeln(verilator_string)
 

@@ -34,9 +34,10 @@ class ToolXilinx(ToolSyn):
 
     """Class providing the interface for Xilinx Vivado synthesis"""
 
-    _XILINX_SOURCE = (
-        "add_files -norecurse $(sourcefile); "
-        "set_property IS_GLOBAL_INCLUDE 1 [get_files $(sourcefile)]")
+    # _XILINX_SOURCE = (
+    #     "add_files -norecurse $(sourcefile); "
+    #     "set_property IS_GLOBAL_INCLUDE 1 [get_files $(sourcefile)]")
+    _XILINX_SOURCE = ("add_files -norecurse $(sourcefile)`")
 
     HDL_FILES = {
         VHDLFile: _XILINX_SOURCE,
