@@ -71,7 +71,7 @@ PWD := $$(shell pwd)
         fileset = self.fileset
         self.write("VERILOG_SRC := ")
         for vlog in fileset.filter(VerilogFile):
-            self.writeln(vlog.rel_path() + " \\")
+            self.writeln(vlog.path + " \\")
         self.writeln()
         self.write("VERILOG_OBJ := ")
         for vlog in fileset.filter(VerilogFile):
@@ -92,7 +92,7 @@ PWD := $$(shell pwd)
         self.writeln()
         self.write("VHDL_SRC := ")
         for vhdl in fileset.filter(VHDLFile):
-            self.write(vhdl.rel_path() + " \\\n")
+            self.write(vhdl.path + " \\\n")
         self.writeln()
         # list vhdl objects (_primary.dat files)
         self.write("VHDL_OBJ := ")
@@ -119,7 +119,7 @@ PWD := $$(shell pwd)
                 self.write("%s: %s" % (os.path.join(
                     file_aux.library, file_aux.purename,
                     ".%s_%s" % (file_aux.purename, file_aux.extension())),
-                    file_aux.rel_path()))
+                    file_aux.path))
                 # list dependencies, do not include the target file
                 for dep_file in [dfile for dfile in file_aux.depends_on
                                  if dfile is not file_aux]:
@@ -131,7 +131,7 @@ PWD := $$(shell pwd)
                             (name, extension)))
                     else:
                         # the file is included -> we depend directly on it
-                        self.write(" \\\n" + dep_file.rel_path())
+                        self.write(" \\\n" + dep_file.path)
                 self.writeln()
                 if isinstance(file_aux, VHDLFile):
                     command_key = 'vhdl'

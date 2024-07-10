@@ -130,7 +130,7 @@ class VsimMakefileWriter(ToolSim):
             self.write("%s: %s" % (os.path.join(
                 vlog.library, vlog.purename,
                 ".%s_%s" % (vlog.purename, vlog.extension())),
-                vlog.rel_path()))
+                vlog.path))
             # list dependencies, do not include the target file
             for dep_file in [dfile for dfile
                              in vlog.depends_on if dfile is not vlog]:
@@ -140,7 +140,7 @@ class VsimMakefileWriter(ToolSim):
                     self.write(" \\\n" + os.path.join(
                         dep_file.library, name, ".%s_%s" % (name, extension)))
                 else:  # the file is included -> we depend directly on the file
-                    self.write(" \\\n" + dep_file.rel_path())
+                    self.write(" \\\n" + dep_file.path)
             self.writeln()
             compile_template = string.Template(
                 "\t\tvlog -work ${library} $$(VLOG_FLAGS) "
@@ -159,7 +159,7 @@ class VsimMakefileWriter(ToolSim):
             # each .dat depends on corresponding .vhd file
             self.write("%s: %s" % (os.path.join(
                 lib, purename, "." + purename + "_" + vhdl.extension()),
-                vhdl.rel_path()))
+                vhdl.path))
             # list dependencies, do not include the target file
             for dep_file in [dfile for dfile in vhdl.depends_on
                              if dfile is not vhdl]:
@@ -169,7 +169,7 @@ class VsimMakefileWriter(ToolSim):
                     self.write(" \\\n" + os.path.join(dep_file.library,
                                name, ".%s_%s" % (name, extension)))
                 else:
-                    self.write(" \\\n" + dep_file.rel_path())
+                    self.write(" \\\n" + dep_file.path)
             self.writeln()
             self.writeln(' '.join(["\t\tvcom $(VCOM_FLAGS)",
                          "-work", lib, "$< "]))
