@@ -80,7 +80,7 @@ class VerilogFile(SourceFile):
     """This is the class providing the generic Verilog file"""
 
     def __init__(self, path, module, library=None,
-                 include_dirs=None):
+                 include_dirs=None, defines={}):
         SourceFile.__init__(self, path=path, module=module, library=library)
         from hdlmake.vlog_parser import VerilogParser
         self.include_dirs = []
@@ -88,6 +88,8 @@ class VerilogFile(SourceFile):
             self.include_dirs.extend(include_dirs)
         self.include_dirs.append(path_mod.relpath(self.dirname))
         self.parser = VerilogParser(self)
+        for k,v in defines.items():
+            self.parser.preprocessor._define(k,v)
         for dir_aux in self.include_paths:
             self.parser.add_search_path(dir_aux)
 
@@ -379,7 +381,7 @@ class SourceFileSet(set):
 
 
 def create_source_file(path, module, library=None,
-                       include_dirs=None):
+                       include_dirs=None, defines={}):
     """Function that analyzes the given arguments and returns a new HDL source
     file of the appropriated type"""
     if path is None or path == "":
@@ -399,12 +401,14 @@ def create_source_file(path, module, library=None,
         new_file = VerilogFile(path=path,
                                module=module,
                                library=library,
-                               include_dirs=include_dirs)
+                               include_dirs=include_dirs,
+                               defines=defines)
     elif extension == 'sv' or extension == 'svh':
         new_file = SVFile(path=path,
                           module=module,
                           library=library,
-                          include_dirs=include_dirs)
+                          include_dirs=include_dirs,
+                          defines=defines)
     elif extension == 'wb':
         new_file = WBGenFile(path=path, module=module)
     elif extension == 'tcl':

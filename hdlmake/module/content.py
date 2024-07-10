@@ -162,11 +162,13 @@ class ModuleContent(ModuleCore):
                 include_dirs = self.manifest_dict['include_dirs']
             else:
                 include_dirs = []
+            defines = self.manifest_dict.get('defines', {})
         else:
             if 'include_dirs' in self.top_module.manifest_dict:
                 include_dirs = self.top_module.manifest_dict['include_dirs']
             else:
                 include_dirs = []
+            defines = self.manifest_dict.get('defines', {})
         for path_aux in paths:
             if os.path.isdir(path_aux):
                 dir_ = os.listdir(path_aux)
@@ -176,10 +178,12 @@ class ModuleContent(ModuleCore):
                         srcs.add(create_source_file(path=f_dir,
                                                     module=self,
                                                     library=self.library,
-                                                    include_dirs=include_dirs))
+                                                    include_dirs=include_dirs,
+                                                    defines=defines))
             else:
                 srcs.add(create_source_file(path=path_aux,
                                             module=self,
                                             library=self.library,
-                                            include_dirs=include_dirs))
+                                            include_dirs=include_dirs,
+                                            defines=defines))
         return srcs
