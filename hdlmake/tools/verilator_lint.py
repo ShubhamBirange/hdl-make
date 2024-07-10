@@ -49,7 +49,7 @@ class ToolVerilatorLint(ToolSim):
 
     SIMULATOR_CONTROLS = {'vlog': 'echo $< >> run.command',
                           'vhdl': 'echo $< >> run.command',
-                          'compiler': 'verilator --lint-only -Wnp-fatal --error-limit 1000 '
+                          'compiler': 'verilator --lint-only -Wall -Wno-fatal --error-limit 1000 '
                                       '-f run.command '
                                       '--top-module $(TOP_MODULE)'}
 
